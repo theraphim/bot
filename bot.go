@@ -85,10 +85,9 @@ func New(token string, options ...Option) (*Bot, error) {
 		o(b)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), b.checkInitTimeout)
-	defer cancel()
-
 	if !b.skipGetMe {
+		ctx, cancel := context.WithTimeout(context.Background(), b.checkInitTimeout)
+		defer cancel()
 		_, err := b.GetMe(ctx)
 		if err != nil {
 			return nil, fmt.Errorf("error call getMe, %w", err)
@@ -112,17 +111,7 @@ func (b *Bot) StartWebhook(ctx context.Context) {
 
 // Start the bot
 func (b *Bot) Start(ctx context.Context) {
-	wg := sync.WaitGroup{}
-
-	wg.Add(1)
-	go b.getUpdates(ctx, &wg)
-
-	wg.Add(b.workers)
-	for i := 0; i < b.workers; i++ {
-		go b.waitUpdates(ctx, &wg)
-	}
-
-	wg.Wait()
+	b.getUpdates(ctx)
 }
 
 func defaultErrorsHandler(err error) {
