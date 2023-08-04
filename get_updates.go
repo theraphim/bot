@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	"github.com/go-telegram/bot/models"
@@ -47,7 +46,7 @@ func (b *Bot) getUpdates(ctx context.Context, wg *sync.WaitGroup) {
 
 		params := &getUpdatesParams{
 			Timeout: int((b.pollTimeout - time.Second).Seconds()),
-			Offset:  atomic.LoadInt64(&b.lastUpdateID) + 1,
+			Offset:  b.lastUpdateID + 1,
 		}
 
 		var updates []*models.Update
@@ -65,11 +64,13 @@ func (b *Bot) getUpdates(ctx context.Context, wg *sync.WaitGroup) {
 		timeoutAfterError = 0
 
 		for _, upd := range updates {
-			atomic.StoreInt64(&b.lastUpdateID, upd.ID)
+			b.lastUpdateID = upd.ID
+
+			// Don't discard when channel is full; rather, discard all when we are shutting down.
 			select {
 			case b.updates <- upd:
-			default:
-				b.error("error send update to processing, channel is full")
+			case <-ctx.Done():
+				return
 			}
 		}
 	}
