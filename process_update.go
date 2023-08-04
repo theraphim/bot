@@ -21,18 +21,13 @@ func applyMiddlewares(h HandlerFunc, m ...Middleware) HandlerFunc {
 func (b *Bot) ProcessUpdate(ctx context.Context, upd *models.Update) {
 	h := b.defaultHandlerFunc
 
-	defer func() {
-		applyMiddlewares(h, b.middlewares...)(ctx, b, upd)
-	}()
-
 	if upd.Message != nil {
 		h = b.findHandler(HandlerTypeMessageText, upd)
-		return
-	}
-	if upd.CallbackQuery != nil {
+	} else if upd.CallbackQuery != nil {
 		h = b.findHandler(HandlerTypeCallbackQueryData, upd)
-		return
 	}
+
+	applyMiddlewares(h, b.middlewares...)(ctx, b, upd)
 }
 
 func (b *Bot) findHandler(handlerType HandlerType, upd *models.Update) HandlerFunc {

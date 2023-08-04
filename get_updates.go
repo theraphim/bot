@@ -3,7 +3,6 @@ package bot
 import (
 	"context"
 	"errors"
-	"sync"
 	"time"
 
 	"github.com/go-telegram/bot/models"
@@ -21,9 +20,7 @@ type getUpdatesParams struct {
 }
 
 // GetUpdates https://core.telegram.org/bots/api#getupdates
-func (b *Bot) getUpdates(ctx context.Context, wg *sync.WaitGroup) {
-	defer wg.Done()
-
+func (b *Bot) getUpdates(ctx context.Context) {
 	var timeoutAfterError time.Duration
 
 	for {
@@ -66,12 +63,7 @@ func (b *Bot) getUpdates(ctx context.Context, wg *sync.WaitGroup) {
 		for _, upd := range updates {
 			b.lastUpdateID = upd.ID
 
-			// Don't discard when channel is full; rather, discard all when we are shutting down.
-			select {
-			case b.updates <- upd:
-			case <-ctx.Done():
-				return
-			}
+			b.ProcessUpdate(ctx, upd)
 		}
 	}
 }
