@@ -28,10 +28,8 @@ func (b *Bot) WebhookHandler() http.HandlerFunc {
 			b.debugHandler("webhook request '%s'", body)
 		}
 
-		select {
-		case b.updates <- update:
-		default:
-			b.error("error send update to processing, channel is full")
-		}
+		// Do not discard updates if channel is full. Blocking isn't bad here.
+		// TODO: add code to reorder updates based on ID.
+		b.updates <- update
 	}
 }
