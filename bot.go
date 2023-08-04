@@ -40,10 +40,10 @@ type Bot struct {
 	errorsHandler ErrorsHandler
 	debugHandler  DebugHandler
 
-	middlewaresMx *sync.RWMutex
+	middlewaresMx sync.RWMutex
 	middlewares   []Middleware
 
-	handlersMx *sync.RWMutex
+	handlersMx sync.RWMutex
 	handlers   map[string]handler
 
 	client           HttpClient
@@ -61,13 +61,11 @@ func New(token string, options ...Option) (*Bot, error) {
 	}
 
 	b := &Bot{
-		url:           "https://api.telegram.org",
-		token:         token,
-		pollTimeout:   defaultPollTimeout,
-		middlewaresMx: &sync.RWMutex{},
-		middlewares:   []Middleware{},
-		handlersMx:    &sync.RWMutex{},
-		handlers:      map[string]handler{},
+		url:         "https://api.telegram.org",
+		token:       token,
+		pollTimeout: defaultPollTimeout,
+		middlewares: []Middleware{},
+		handlers:    map[string]handler{},
 		client: &http.Client{
 			Timeout: defaultPollTimeout,
 		},

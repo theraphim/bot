@@ -2,7 +2,6 @@ package bot
 
 import (
 	"regexp"
-	"sync"
 	"testing"
 
 	"github.com/go-telegram/bot/models"
@@ -10,8 +9,7 @@ import (
 
 func Test_match_func(t *testing.T) {
 	b := &Bot{
-		handlersMx: &sync.RWMutex{},
-		handlers:   map[string]handler{},
+		handlers: map[string]handler{},
 	}
 
 	var called bool
@@ -37,8 +35,7 @@ func Test_match_func(t *testing.T) {
 
 func Test_match_exact(t *testing.T) {
 	b := &Bot{
-		handlersMx: &sync.RWMutex{},
-		handlers:   map[string]handler{},
+		handlers: map[string]handler{},
 	}
 
 	id := b.RegisterHandler(HandlerTypeMessageText, "xxx", MatchTypeExact, nil)
@@ -58,8 +55,7 @@ func Test_match_exact(t *testing.T) {
 
 func Test_match_prefix(t *testing.T) {
 	b := &Bot{
-		handlersMx: &sync.RWMutex{},
-		handlers:   map[string]handler{},
+		handlers: map[string]handler{},
 	}
 
 	id := b.RegisterHandler(HandlerTypeCallbackQueryData, "abc", MatchTypePrefix, nil)
@@ -79,8 +75,7 @@ func Test_match_prefix(t *testing.T) {
 
 func Test_match_contains(t *testing.T) {
 	b := &Bot{
-		handlersMx: &sync.RWMutex{},
-		handlers:   map[string]handler{},
+		handlers: map[string]handler{},
 	}
 
 	id := b.RegisterHandler(HandlerTypeCallbackQueryData, "abc", MatchTypeContains, nil)
@@ -100,8 +95,7 @@ func Test_match_contains(t *testing.T) {
 
 func Test_match_regexp(t *testing.T) {
 	b := &Bot{
-		handlersMx: &sync.RWMutex{},
-		handlers:   map[string]handler{},
+		handlers: map[string]handler{},
 	}
 
 	re := regexp.MustCompile("^[a-z]+")
@@ -123,8 +117,7 @@ func Test_match_regexp(t *testing.T) {
 
 func Test_match_invalid_type(t *testing.T) {
 	b := &Bot{
-		handlersMx: &sync.RWMutex{},
-		handlers:   map[string]handler{},
+		handlers: map[string]handler{},
 	}
 
 	id := b.RegisterHandler(-1, "", -1, nil)
@@ -139,8 +132,7 @@ func Test_match_invalid_type(t *testing.T) {
 
 func TestBot_RegisterUnregisterHandler(t *testing.T) {
 	b := &Bot{
-		handlersMx: &sync.RWMutex{},
-		handlers:   map[string]handler{},
+		handlers: map[string]handler{},
 	}
 
 	id1 := b.RegisterHandler(HandlerTypeCallbackQueryData, "", MatchTypeExact, nil)
